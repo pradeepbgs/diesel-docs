@@ -1,0 +1,76 @@
+---
+title: Router Overview
+---
+
+In this document, we will cover the basic HTTP methods used in routing (GET, POST, etc.) and how to implement sub-routing in your application using the `app.register` method.
+
+## HTTP Methods
+
+#### Example:
+
+```typescript
+
+app.get('/home', (ctx:ContextType) => {
+  ctx.status(200).text('Welcome to the home page!');
+})
+
+app.post("/upload",(ctx:ContextType) => {
+    // your logic here
+})
+
+app.put("/update",(ctx:ContextType) => {
+    // your logic here
+})
+
+app.patch("/patch",(ctx:ContextType) => {
+    // your logic here
+})
+
+app.delete("/delete-user",(ctx:ContextType) => {
+    // your logic here
+})
+
+```
+
+## Sub-Routing with ***app.register***
+
+**Sub-routing allows you to organize your routes better by grouping them based on functionality. In our example, we will register user-related routes under a versioned API.**
+
+### Example
+
+user.route.ts
+```typescript
+import {Router} from "diesel-core";
+
+export const UserRoute = new Router();
+
+
+route.get("/register/:id",(ctx:ContextType) => {
+  return ctx.text('User registered with ID: ' + ctx.getParams('id'));
+})
+
+route.get("/login",(ctx:ContextType)=>{
+  return ctx.text("hello loin")
+})
+```
+**Registering Sub-Routes in the Main Application**
+
+Now, in your main application, you can register these routes using the app.register method:
+```typescript
+
+import {UserRoute} from 'user.route.ts'
+
+app.register("/api/v1/user",UserRoute)
+```
+***The `app.register()` Method***
+
+**takes two arguments**
+1. **path** : The base path where you want to group all your specific routes (e.g., /api/v1/user).
+2. ** Router instance** : The router instance containing the routes you want to register (e.g., UserRoute).
+
+This structure allows for better organization and modularization of your route definitions, leading to cleaner and more manageable code.
+
+### Conclusion
+
+**By understanding and utilizing HTTP methods along with sub-routing, you can create a well-structured and efficient routing system in your application. This approach not only enhances the clarity of your routes but also promotes better code organization.**
+

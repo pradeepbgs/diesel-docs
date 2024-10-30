@@ -1,0 +1,41 @@
+---
+title: Getting Started with Diesel
+---
+
+Diesel is a simple and lightweight HTTP server library for Bun.js that provides you with complete control over your API routes and middleware. It is designed to be intuitive and efficient, allowing you to quickly set up a server, define routes, and optimize important paths for faster response times.
+
+With built-in support for TypeScript, DieselJS ensures type safety and improved developer experience, making it easier to catch errors during development. Whether you are building a small application or a large API, DieselJS helps you manage your routes and middleware seamlessly.
+## Quick Start
+
+You can install Diesel from npm:
+
+
+```bash
+npm install diesel-core
+```
+```bash
+bun add diesel-core
+```
+```bash
+yarn add diesel-core
+```
+```bash
+pnpm install diesel-core
+```
+
+### Code Example
+```javascript
+import {Diesel}  from "diesel-core"
+
+const app = new Diesel()
+const port = 3000
+
+app.get("/", async (ctx:ContextType) => {
+ return ctx.status(200).text("Hello world...!")
+})
+
+// Start the server
+app.listen(port, () => {
+  console.log(`diesel is running on port ${port}`)
+})
+```
