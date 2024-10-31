@@ -24,7 +24,10 @@ pnpm install diesel-core
 ```
 
 ### Code Example
-```javascript
+
+import {Code} from '@astrojs/starlight/components';
+
+export const mainCode = `
 import {Diesel}  from "diesel-core"
 
 const app = new Diesel()
@@ -36,6 +39,11 @@ app.get("/", async (ctx:ContextType) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`diesel is running on port ${port}`)
+  console.log('diesel is running on port '+port)
 })
-```
+`;
+
+export const fileName = `main.ts`;
+export const highlights = ['file', 'CMS'];
+
+<Code code = {mainCode} lang='ts' title={fileName} mark={highlights} />

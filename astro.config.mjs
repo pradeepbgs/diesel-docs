@@ -25,6 +25,18 @@ export default defineConfig({
 						{
 							label: 'Context',
 							slug: 'getting-started/ctx',
+						},
+						{
+							label: 'Filter',
+							slug: 'getting-started/filter',
+						},
+						{
+							label: 'Middleware',
+							slug: 'getting-started/middleware',
+						},
+						{
+							label: 'hooks',
+							slug: 'getting-started/hooks'
 						}
 					],
 				},
