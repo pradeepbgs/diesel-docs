@@ -1,0 +1,77 @@
+---
+title: Filters and Route Security
+---
+
+Diesel makes it easy to manage both public and protected routes by using the powerful `filter()` method. With `filter()`, you can define specific routes as publicly accessible while enforcing authentication or custom middleware for protected routes. This approach enables fine-grained control over route security, ensuring sensitive resources are well-guarded.
+
+### How to Use `filter()`
+
+The `filter()` method allows you to selectively secure certain endpoints while keeping others open. With `permitAll()`, you can mark specific routes as public, while `require()` applies authentication or other middleware to remaining routes. This flexibility helps keep user information secure while providing accessible, unauthenticated routes as needed.
+
+### Example Usage
+
+Here’s an example setup using Diesel with JWT-based authentication:
+
+```typescript
+import { Diesel } from "diesel-core";
+import authJwt from './middleware';
+
+const app = new Diesel();
+
+// Define routes and apply filters
+app
+  .filter()
+  .routeMatcher('/api/user/register', '/api/user/login', '/test/:id', '/cookie') // Public routes
+  .permitAll() // Mark as public, no authentication required
+  .require(authJwt); // Apply `authJwt` middleware to all other routes
+
+// Public route example (no authentication needed)
+app.get("/api/user/register", async (xl) => {
+  return xl.json({ msg: "This is a public route. No authentication needed." });
+});
+
+// Protected route example (requires authentication)
+app.get("/api/user/profile", async (xl) => {
+  const user = xl.getUser();
+  return xl.json({
+    msg: "You are authenticated!",
+    user
+  });
+});
+
+```
+In this example:
+* **Public routes** like `/api/user/register` and `/api/user/login` are specified with permitAll() and do not require authentication.
+* **Protected routes** like /api/user/profile are guarded by authJwt, ensuring only authenticated users can access them.
+
+### Filter Methods
+* `routeMatcher(...routes: string[])`: Specifies which routes should be public (unauthenticated). Supports dynamic parameters (e.g., "/","/login","/register").
+```typescript
+.routeMatcher('/api/user/register', '/api/user/login', '/test/:id')
+```
+* `permitAll()` : Marks routes in routeMatcher() as publicly accessible, bypassing middleware.
+```typescript
+.permitAll()
+```
+* `require(fnc?:middlewareFunc)`:  Defines a middleware requirement for routes not included in routeMatcher(). If no function is provided, Diesel defaults to an "Unauthorized" response.
+```typescript
+.require(authJwt)
+```
+
+### Use Cases
+**Public Routes**
+Routes like `/api/user/register` and `/api/user/login` are often public to allow user registration and login without prior authentication. These routes can be added to `routeMatcher()` and marked with `permitAll()` for easy access.
+
+**Protected Routes**
+For routes handling sensitive information `(e.g., /api/user/profile)`, apply `require(authJwt)` to enforce authentication. Only users with valid JWTs will be able to access these routes, adding an essential layer of security.
+
+### Benefits of Using Filters in Diesel
+* **No Need for `app.use()` Middleware** : Diesel's filter() method streamlines route protection, eliminating the need for app.use() middleware for individual routes. Filters automatically manage which routes require authentication and which don't, making configuration simpler and keeping your code uncluttered.
+
+* **Flexible Security** : Easily toggle between public and protected routes.
+
+* **Centralized Authentication**: Manage route security in one place for cleaner, more maintainable code.
+
+* **Scalable Middleware**: Add custom middleware functions to protect routes or validate requests based on business needs.
+
+With Diesel’s `filter()`, securing routes becomes efficient, clear, and adaptable, allowing you to manage public and private endpoints seamlessly.
