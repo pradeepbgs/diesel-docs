@@ -32,14 +32,47 @@ app.delete("/delete-user",(ctx:ContextType) => {
 
 ```
 
-## Sub-Routing with ***app.register***
+## Sub-Routing in Diesel
+**In Diesel there are two ways to do sub-routing** 
+1. You can create an another Diesel instance `new Diesel` and can register route with `app.route(path,routerInstance)`
 
-**Sub-routing allows you to organize your routes better by grouping them based on functionality. In our example, we will register user-related routes under a versioned API.**
+2. Either you can create a new instance of `Router` -> `new Router`and can register route with `app.register(path,routerInstance)`
 
-### Example
+### 1. Example with new Diesel()
 
-user.route.ts
+import {Code} from '@astrojs/starlight/components';
+export const newDieselCode = `
+import {Diesel} from "diesel-core";
+
+export const UserRoute = new Diesel();
+
+
+route.get("/register/:id",(ctx:ContextType) => {
+  return ctx.text('User registered with ID: ' + ctx.getParams('id'));
+})
+
+route.get("/login",(ctx:ContextType)=>{
+  return ctx.text("hello loin")
+})
+`
+export const fileName = `user.route.ts`;
+export const highlights = ['file', 'CMS'];
+
+<Code code={newDieselCode} lang='ts' title={fileName} mark={highlights}/>
+
+
+**Registering Sub-Routes in the Main Application**
+
 ```typescript
+import {UserRoute} from 'user.route.ts'
+
+app.route("/api/v1/user",UserRoute)
+```
+
+
+### 2. Example with new Router()
+
+export const newRouterClasssCode = `
 import {Router} from "diesel-core";
 
 export const UserRoute = new Router();
@@ -52,21 +85,24 @@ route.get("/register/:id",(ctx:ContextType) => {
 route.get("/login",(ctx:ContextType)=>{
   return ctx.text("hello loin")
 })
-```
+`
+
+<Code code={newRouterClasssCode} lang='ts' title={fileName} mark={highlights}/>
+
+
 **Registering Sub-Routes in the Main Application**
 
-Now, in your main application, you can register these routes using the app.register method:
 ```typescript
-
 import {UserRoute} from 'user.route.ts'
 
 app.register("/api/v1/user",UserRoute)
 ```
-***The `app.register()` Method***
+
+**The `app.register()` & `app.route()` Method**
 
 **takes two arguments**
 1. **path** : The base path where you want to group all your specific routes (e.g., /api/v1/user).
-2. ** Router instance** : The router instance containing the routes you want to register (e.g., UserRoute).
+2. **Router instance** : The router instance containing the routes you want to register (e.g., UserRoute).
 
 This structure allows for better organization and modularization of your route definitions, leading to cleaner and more manageable code.
 
