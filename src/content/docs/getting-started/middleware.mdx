@@ -57,6 +57,42 @@ app.use(authJwt);
 // Route-specific middleware
 app.use("/user", authJwt);
 ```
+### Using Multiple Middleware Functions
+
+**Diesel supports chaining multiple middleware functions in a single `app.use` call. Middleware functions are executed in the order they are provided:**
+
+```typescript
+// Applying multiple middleware globally
+app.use(middleware1, middleware2, middleware3);
+
+// Applying multiple middleware to a specific path
+app.use("/user", middleware1, middleware2);
+```
+### Route-specific Middleware
+
+**In addition to `app.use`, you can attach middleware directly to individual routes. This allows for fine-tuned control, applying middleware only to specific requests.**
+
+#### Example Usage
+**Imagine you have an authentication middleware `authJwt`, which you only want to apply to specific routes. You can set it up like this:**
+
+```typescript
+// Define an endpoint with middleware
+app.get("/user", authJwt, (ctx) => {
+  // Authenticated route logic
+  ctx.json({ message: "Welcome, authenticated user!" });
+});
+
+// You can add multiple middleware functions as needed
+app.post("/post", authJwt, requestLogger, (ctx) => {
+  ctx.json({ message: "Your post was successfully created!" });
+});
+```
+**Here**:
+* `authJwt` checks for user authentication.
+* Additional middleware `(e.g., requestLogger)` can be added in the same line, providing flexibility.
+* The main handler `(ctx) => {}` only runs if all middleware calls successfully proceed.
+
+
 
 ### Other Middleware Example
 
@@ -75,39 +111,6 @@ app.use(requestLogger);
 **Although you can use `onRequest()` hook to log incoming req details , 
 which we will know in next section**  
 
-
-
-# Using Middleware with HTTP Methods
-
-In addition to `app.use(path, middleware)`, you can also attach middleware directly to individual routes, such as `app.get`, `app.post`, etc. This allows for **fine-tuned** control, applying middleware only to specific requests.
-
-## Route-specific Middleware
-
-When using `app.get`, `app.post`, and other HTTP methods, you can pass middleware functions as additional arguments before the route handler. This is helpful for applying authentication or validation to a single endpoint without affecting others.
-
-### Example Usage
-
-Imagine you have an authentication middleware `authJwt`, which you only want to apply to specific routes. You can set it up like this:
-
-export const thiscode = `
-// Define an endpoint with middleware
-app.get("/user", authJwt, (ctx) => {
-  // Authenticated route logic
-  ctx.json({ message: "Welcome, authenticated user!" });
-});
-
-// You can add multiple middleware functions as needed
-app.post("/post", authJwt, requestLogger, (ctx) => {
-  ctx.json({ message: "Your post was successfully created!" });
-});
-`;
-
-<Code code={thiscode} lang='ts' title='user.ts' mark={highlights}/>
-
-**Here**:
-* `authJwt` checks for user authentication.
-* Additional middleware `(e.g., requestLogger)` can be added in the same line, providing flexibility.
-* The main handler `(ctx) => {}` only runs if all middleware calls successfully proceed.
 
 # Summary
 **Middleware in Diesel and other frameworks is powerful without `next()` handling:**
