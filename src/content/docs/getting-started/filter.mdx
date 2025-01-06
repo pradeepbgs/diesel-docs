@@ -23,17 +23,17 @@ app
   .filter()
   .routeMatcher('/api/user/register', '/api/user/login', '/test/:id', '/cookie') // Public routes
   .permitAll() // Mark as public, no authentication required
-  .require(authJwt); // Apply `authJwt` middleware to all other routes
+  .require(authJwt as middlewareFunc); // Apply `authJwt` middleware to all other routes
 
 // Public route example (no authentication needed)
-app.get("/api/user/register", async (xl) => {
-  return xl.json({ msg: "This is a public route. No authentication needed." });
+app.get("/api/user/register", async (ctx:ContextType) => {
+  return ctx.json({ msg: "This is a public route. No authentication needed." });
 });
 
 // Protected route example (requires authentication)
-app.get("/api/user/profile", async (xl) => {
+app.get("/api/user/profile", async (ctx:ContextType) => {
   const user = xl.getUser();
-  return xl.json({
+  return ctx.json({
     msg: "You are authenticated!",
     user
   });
