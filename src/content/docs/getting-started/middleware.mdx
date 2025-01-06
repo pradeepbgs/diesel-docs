@@ -28,14 +28,14 @@ async function authJwt(ctx: ContextType, server?: Server): Promise<void | Respon
     const token = ctx.getCookie("accessToken");
     
     if (!token) {
-      return ctx.status(401).json({ message: "Authentication token missing" });
+      return ctx.json({ message: "Authentication token missing" },401);
     }
     
     // Verify the JWT token using a secret key
     const user = jwt.verify(token, secret);
     ctx.set('user', user);  // Store the user in the context
   } catch (error) {
-    return ctx.status(403).json({ message: "Invalid token" });
+    return ctx.json({ message: "Invalid token" },403);
   }
 }
 `;
@@ -77,14 +77,14 @@ app.use("/user", middleware1, middleware2);
 
 ```typescript
 // Define an endpoint with middleware
-app.get("/user", authJwt, (ctx) => {
+app.get("/user", authJwt, (ctx:ContextType) => {
   // Authenticated route logic
-  ctx.json({ message: "Welcome, authenticated user!" });
+  return ctx.json({ message: "Welcome, authenticated user!" });
 });
 
 // You can add multiple middleware functions as needed
-app.post("/post", authJwt, requestLogger, (ctx) => {
-  ctx.json({ message: "Your post was successfully created!" });
+app.post("/post", authJwt, requestLogger, (ctx:ContextType) => {
+  return ctx.json({ message: "Your post was successfully created!" });
 });
 ```
 **Here**:

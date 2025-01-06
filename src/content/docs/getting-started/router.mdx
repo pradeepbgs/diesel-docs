@@ -11,7 +11,7 @@ In this document, we will cover the basic HTTP methods used in routing (GET, POS
 ```typescript
 
 app.get('/home', (ctx:ContextType) => {
-  ctx.status(200).text('Welcome to the home page!');
+  ctx.text('Welcome to the home page!');
 })
 
 app.post("/upload",(ctx:ContextType) => {

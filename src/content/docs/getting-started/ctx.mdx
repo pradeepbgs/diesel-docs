@@ -14,18 +14,14 @@ The `ctx` context is an essential object that provides various methods and prope
 ## Methods
 
 - **getUser()**: Returns the current user object.
-- **getUser()**: Returns the current user object.
 
-  ```typescript
-  const user = ctx.getUser();
+```typescript
+const user = ctx.getUser();
+```
 
 - **setUser(data)**: Sets the user object.
 ```typescript
 ctx.setUser({ id: 1, name: 'John Doe' });
-```
-- **status(status)**: Sets the response status code.
-```typescript
-ctx.status(404);
 ```
 - **getIP()**: Retrieves the client's IP address.
 ```typescript
@@ -77,20 +73,11 @@ app.get("/user-privae-profile",async (ctx) => {
 ctx.text('Hello, World!', 200);
 ```
 
-- **send(data, status)**: Sends a response with the provided data.
-```typescript
-ctx.send('This is a response!', 200);
-```
-
 - **json(data, status)**: Sends a JSON response.
 ```typescript
 ctx.json({ message: 'Success' }, 200);
 ```
 
-- **html(filepath, status)**: Serves an HTML file.
-```typescript
-ctx.html('./index.html', 200);
-```
 
 - **file(filePath, status)**: Serves a file response.
 ```typescript
@@ -104,7 +91,7 @@ ctx.redirect('/login', 302);
 ```
 - **setCookie(name, value, options)**: Sets a cookie in the response.
 ```typescript
-app.get("/cookie", async (xl) => {
+app.get("/cookie", async (ctx:ContextType) => {
   const user = {
     name: "pk",
     age: 22,
@@ -120,10 +107,10 @@ app.get("/cookie", async (xl) => {
     path: "/", // Cookie available for all routes
   };
   return (
-    xl
+    ctx
       .setCookie("accessToken", accessToken, options)
       .setCookie("refreshToken", refreshToken, options)
-      .json({ msg: "setting cookies" })
+      .json({ msg: "setting cookies" },200)
   );
 });
 ```
@@ -152,18 +139,18 @@ Here’s how you might utilize some of these methods in a route handler:
 async function authJwt(ctx: ContextType): Promise<void | null | Response> {
   const token = ctx.getCookie("accessToken");
   if (!token) {
-    return ctx.status(401).json({ message: "Authentication token missing" });
+    return ctx.json({ message: "Authentication token missing" },401);
   }
   try {
-    const user = jwt.verify(token, secret); // Replace with your JWT secret
+    const user = jwt.verify(token, secret);
     ctx.setUser(user);
   } catch (error) {
-    return ctx.status(403).json({ message: "Invalid token" });
+    return ctx.json({ message: "Invalid token" },403);
   }
 }
 
-app.get('/example', authJwt, async (ctx: ContextType) => {
+app.get('/get-user', authJwt, async (ctx: ContextType) => {
   const user = ctx.getUser();
-  ctx.status(200).json({ message: 'Hello, ' + user.name });
+  ctx.json({ message: 'Hello, ' + user.name });
 });
 ```
