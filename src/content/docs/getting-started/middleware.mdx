@@ -63,12 +63,14 @@ app.use("/user", authJwt);
 
 ```typescript
 // Applying multiple middleware globally
-app.use(middleware1, middleware2, middleware3);
+app.use([middleware1, middleware2, middleware3]);
 
 // Applying multiple middleware to a specific path
-app.use("/user", middleware1, middleware2);
+app.use("/user", [middleware1, middleware2]);
+
+app.use(["/user","/home"],[middleware1, middleware2])
 ```
-### Route-specific Middleware
+### Route-specific Middleware in Handler Method
 
 **In addition to `app.use`, you can attach middleware directly to individual routes. This allows for fine-tuned control, applying middleware only to specific requests.**
 
