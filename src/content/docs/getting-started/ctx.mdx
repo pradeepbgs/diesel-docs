@@ -2,155 +2,103 @@
 title: Understanding `ctx` Context
 ---
 
-
-The `ctx` context is an essential object that provides various methods and properties for handling requests and responses in your application. Below are the key components of the `ctx` context:
+## Overview
+The `ctx` context is an essential object that provides various methods and properties for handling requests and responses in your application. It simplifies request handling, response formatting, and state management within the server.
 
 ## Properties
 
 - **req**: The incoming request object.
 - **server**: The server instance.
 - **url**: The URL of the request.
+- **headers**: Custom headers applied to the response.
+- **query**: Parsed query parameters.
+- **params**: Extracted route parameters.
+- **cookies**: Parsed cookies from the request.
+- **body**: The parsed request body.
 
 ## Methods
 
-- **getUser()**: Returns the current user object.
+### Request Handling
+- **get ip**: Retrieves the client's IP address.
+  ```typescript
+  const clientIP = ctx.ip;
+  ```
+- **get query**: Retrieves parsed query parameters.
+  ```typescript
+  const queryParams = ctx.query;
+  const queryParam = ctx.query?.name;
+  ```
+- **get params**: Retrieves dynamic route parameters.
+  ```typescript
+  const routeParams = ctx.params;
+  const routeParam = ctx.params?.paramsName
+  ```
+- **get body**: Retrieves the parsed request body.
+  ```typescript
+  const body = await ctx.body;
+  ```
 
-```typescript
-const user = ctx.getUser();
-```
-
-- **setUser(data)**: Sets the user object.
-```typescript
-ctx.setUser({ id: 1, name: 'John Doe' });
-```
-- **getIP()**: Retrieves the client's IP address.
-```typescript
-const clientIP = ctx.getIP();
-```
-- **getBody()**: Parses and returns the request body.
-```typescript
-const body = await ctx.getBody();
-```
-
+### Response Handling
 - **setHeader(key, value)**: Sets a response header.
-```typescript
-ctx.setHeader('Content-Type', 'application/json');
-```
+  ```typescript
+  ctx.setHeader("Content-Type", "application/json");
+  ```
+- **removeHeader(key)**: Removes a response header.
+  ```typescript
+  ctx.removeHeader("Cache-Control");
+  ```
+- **text(data, status?)**: Sends a plain text response.
+  ```typescript
+  ctx.text("Hello, World!", 200);
+  ```
+- **json(data, status?)**: Sends a JSON response.
+  ```typescript
+  ctx.json({ message: "Success" }, 200);
+  ```
+- **send(data, status?)**: Sends a response with appropriate MIME type.
+  ```typescript
+  ctx.send({ key: "value" }, 200);
+  ```
+- **file(filePath, status?, mimeType?)**: Serves a file response.
+  ```typescript
+  ctx.file("./downloads/sample.pdf", 200);
+  ```
+- **redirect(path, status?)**: Redirects to a specified path.
+  ```typescript
+  ctx.redirect("/login", 302);
+  ```
 
+### Context Management
 - **set(key, value)**: Stores a key-value pair in the context.
-```typescript
-ctx.set('user', {username:"abcd",email:"abcd@gmail.com"});
-```
+  ```typescript
+  ctx.set("user", { username: "abcd", email: "abcd@gmail.com" });
+  ```
+- **get(key)**: Retrieves a value from the context.
+  ```typescript
+  const user = ctx.get("user");
+  ```
 
-- **get(key)**: Retrieves a value by key.
-```typescript
-const user = ctx.get('user')
-```
-
-- **setAuth(authStatus)**: Sets the authentication status.
-```typescript
-function async authMidl (ctx) {
-    const token = ctx.getCookie('accessToken')
-    const decodecToken = await jwt.verify(decodecToken,secret)
-
-    if(decodecToken){
-        ctx.setAuth(true)
-    }
-}
-
-```
-- **getAuth()**: Returns the authentication status.
-```typescript
-app.get("/user-privae-profile",async (ctx) => {
-    const isLoggedInUser = ctx.getAuth()
-    if(isLoggedInUser === false) {
-        // return user is not authenticated
-    }
-})
-```
-- **text(data, status)**: Sends a text response.
-```typescript
-ctx.text('Hello, World!', 200);
-```
-
-- **json(data, status)**: Sends a JSON response.
-```typescript
-ctx.json({ message: 'Success' }, 200);
-```
-
-
-- **file(filePath, status)**: Serves a file response.
-```typescript
-ctx.file('./downloads/sample.pdf', 200);
-```
-
-- **redirect(path, status)**: Redirects to a specified path.
-```typescript
-ctx.redirect('/login', 302);
-// status code is optional everywhere
-```
-- **setCookie(name, value, options)**: Sets a cookie in the response.
-```typescript
-app.get("/cookie", async (ctx:ContextType) => {
-  const user = {
-    name: "pk",
-    age: 22,
-  };
-
-  const accessToken = jwt.sign(user, secret, { expiresIn: "1d" });
-  const refreshToken = jwt.sign(user, secret, { expiresIn: "10d" });
-  const options: CookieOptions = {
-    httpOnly: true, // Makes cookie accessible only by the web server (not JS)
-    secure: true, // Ensures the cookie is sent over HTTPS
-    maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-    sameSite: "Strict", // Prevents CSRF (strict origin policy)
-    path: "/", // Cookie available for all routes
-  };
-  return (
-    ctx
-      .setCookie("accessToken", accessToken, options)
-      .setCookie("refreshToken", refreshToken, options)
-      .json({ msg: "setting cookies" },200)
-  );
-});
-```
-
-- **getParams(props)**: Retrieves route parameters.
-```typescript
-const userId = ctx.getParams('id');
-// noet : - parameter is optional
-```
-- **getQuery(props)**: Gets query parameters from the URL.
-```typescript
-const searchTerm = ctx.getQuery('search');
-// same parameter is optional
-```
-- **getCookie(cookieName)**: Fetches a cookie value by name.
-```typescript
-const userCookie = ctx.getCookie('username');
-```
+### Cookie Handling
+- **setCookie(name, value, options?)**: Sets a cookie in the response.
+  ```typescript
+  ctx.setCookie("session", "abc123", { httpOnly: true, secure: true });
+  ```
+- **get cookies**: Retrieves parsed cookies from the request.
+  ```typescript
+  const userToken = ctx.cookies?.session;
+  ```
 
 ## Example Usage
 
-Here’s how you might utilize some of these methods in a route handler:
-
 ```typescript
-
-async function authJwt(ctx: ContextType): Promise<void | null | Response> {
-  const token = ctx.getCookie("accessToken");
-  if (!token) {
-    return ctx.json({ message: "Authentication token missing" },401);
+app.get("/profile", async (ctx) => {
+  const user = ctx.get("user");
+  if (!user) {
+    return ctx.json({ error: "Unauthorized" }, 401);
   }
-  try {
-    const user = jwt.verify(token, secret);
-    ctx.setUser(user);
-  } catch (error) {
-    return ctx.json({ message: "Invalid token" },403);
-  }
-}
-
-app.get('/get-user', authJwt, async (ctx: ContextType) => {
-  const user = ctx.getUser();
-  ctx.json({ message: 'Hello, ' + user.name });
+  return ctx.json({ profile: user });
 });
 ```
+
+This documentation provides a structured and clear explanation of `ctx` functionalities to help developers effectively utilize it in their applications.
+
