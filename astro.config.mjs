@@ -37,6 +37,10 @@ export default defineConfig({
 						{
 							label: 'hooks',
 							slug: 'getting-started/hooks'
+						},
+						{
+							label:'logger',
+							slug:'getting-started/logger'
 						}
 					],
 				},

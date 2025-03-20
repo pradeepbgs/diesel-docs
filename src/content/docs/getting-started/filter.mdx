@@ -9,8 +9,7 @@ Diesel makes it easy to manage both public and protected routes using the powerf
 The `setupFilter()` method allows you to selectively secure certain endpoints while keeping others open. With `permitAll()`, you can mark specific routes as public, while `authenticate()` applies one or more middleware functions to remaining routes. This flexibility helps keep user information secure while providing accessible, unauthenticated routes as needed.
 
 ### Example Usage
-
-Here’s an example setup using Diesel with JWT-based authentication and additional middleware:
+Using setupFilter() with JWT Authentication and Middleware
 
 ```typescript
 import { Diesel } from "diesel-core";
@@ -41,6 +40,63 @@ app.get("/api/user/profile", async (ctx: ContextType) => {
 });
 ```
 
+### Built-in JWT Authentication Filters
+**authenticateJwt()**
+authenticateJwt(jwt) provides an inbuilt JWT authentication filter. Once applied, you can access the user context via `ctx.get("user")`.
+
+
+Example Usage:
+```ts
+import { Diesel } from "diesel-core";
+import jwt from 'jsonwebtoken'
+
+const app = new Diesel();
+
+// Define routes and apply filters
+app
+  .setupFilter()
+  .routeMatcher("/api/user/register", "/api/user/login", "/test/:id", "/cookie") // Public routes
+  .permitAll() // Mark as public, no authentication required
+  .authenticateJwt(jwt); // Inbuilt jwt filter
+
+  // and you will get `user` Context in ctx.get('user')
+  app.get("/profile", async(ctx) => {
+    // you will get user context 
+    const userDetails = ctx.get("user")
+
+    ....
+  })
+
+```
+**`authenticateJwtDB()`**
+`authenticateJwtDB(jwt, UserModel)` integrates JWT authentication with a database model for user validation.
+
+Example:
+
+```ts
+import { Diesel } from "diesel-core";
+import jwt from 'jsonwebtoken'
+import UserModel from "./schema/userModel"
+
+const app = new Diesel();
+
+// Define routes and apply filters
+app
+  .setupFilter()
+  .routeMatcher("/api/user/register", "/api/user/login", "/test/:id", "/cookie") // Public routes
+  .permitAll() // Mark as public, no authentication required
+  .authenticateJwtDB(jwt,UserModel); // Inbuilt jwt filter
+
+  // and you will get `user` Context in ctx.get('user')
+  app.get("/profile", async(ctx) => {
+    // you will get user context 
+    const userDetails = ctx.get("user")
+
+    ....
+  })
+
+```
+
 ### Breakdown of `setupFilter()` Methods
 
 * `routeMatcher(...routes: string[])`: Specifies which routes should be public (unauthenticated). Supports dynamic parameters (e.g., "/api/user/register", "/api/user/login").
@@ -56,6 +112,10 @@ app.get("/api/user/profile", async (ctx: ContextType) => {
 ```
 
 * `authenticate(fnc?: middlewareFunc[])`: Defines one or more middleware functions for routes not included in `routeMatcher()`. If no function is provided, Diesel defaults to an "Unauthorized" response.
+
+* `authenticateJwt(jwt)`: Provides built-in JWT authentication middleware.
+
+* `authenticateJwtDB(jwt,UserModel)`: Provides built-in more secure JWT authentication middleware
 
 ```typescript
 .authenticate([authJwt, rateLimiter])
