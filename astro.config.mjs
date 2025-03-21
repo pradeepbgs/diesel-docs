@@ -41,6 +41,10 @@ export default defineConfig({
 						{
 							label:'logger',
 							slug:'getting-started/logger'
+						},
+						{
+							label:'File Routing',
+							slug:'getting-started/file-routing'
 						}
 					],
 				},

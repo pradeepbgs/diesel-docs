@@ -1,0 +1,96 @@
+---
+title: File-Based Routing in DieselJD
+---
+
+DieselJD provides an intuitive **file-based routing** system inspired by Next.js, allowing users to create API routes effortlessly by simply placing `.js` or `.ts` files inside the `src/routes/` directory.
+
+## How It Works
+- **Each file inside `src/routes/` automatically becomes an API route.**
+- **Supports multiple HTTP methods (`GET`, `POST`, etc.) in a single file** using named exports.
+- **Nested folders create nested API routes**, making organization easier.
+- **Supports a base API URL (`baseApiUrl`)** that prefixes all routes.
+
+## Example Directory Structure
+    * Note - Make sure your server file is in your root directory and routes folder under src/
+```bash
+example/
+├── src/
+│   ├── controller/
+│   ├── routes/
+│   │   ├── auth/
+│   │   │   ├── login.ts
+│   │   │   ├── register.js
+│   │   ├── user/
+│   │   │   ├── profile/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── delete.ts
+│   │   │   │   ├── videos.ts
+│   ├── utils/
+│   ├── server.ts // root
+```
+
+### Route Mapping (Without `baseApiUrl`)
+
+```txt
+File Path                          | API Route
+------------------------------------|-----------
+src/routes/hello.ts              | /hello  
+src/routes/auth/login.ts         | /auth/login  
+src/routes/user/profile/index.ts | /user/profile/  
+src/routes/user/profile/videos.ts | /user/profile/videos  
+```
+
+### Using `baseApiUrl`
+You can configure a base API URL, which prefixes all routes:
+
+```ts
+const app = new Diesel({
+  baseApiUrl: "/api/v1"
+});
+```
+
+With this setup, all API endpoints will be prefixed with `/api/v1`:
+
+```txt
+File Path                          | API Route
+------------------------------------|-----------
+src/routes/hello.ts              | /api/v1/hello  
+src/routes/auth/login.ts         | /api/v1/auth/login  
+src/routes/user/profile/index.ts | /api/v1/user/profile/  
+src/routes/user/profile/videos.ts | /api/v1/user/profile/videos  
+```
+
+## Writing API Routes
+A route file can export functions corresponding to HTTP methods (like `GET`, `POST`, etc.).
+
+### `src/routes/auth/login.ts`
+```ts
+import { type ContextType } from "diesel-core";
+import { asyncHandler } from "../../utils/try-catch";
+
+export const POST = asyncHandler(async (ctx: ContextType) => {
+  const { email, password } = await ctx.body;
+  
+  if (!email || !password) {
+    return ctx.json({ message: "Email and password are required" }, 400);
+  }
+
+  return ctx.json({ message: "Login successful" }, 200);
+});
+
+export const GET = asyncHandler(async (ctx: ContextType) => {
+  return ctx.json({ message: "GET request received" }, 200);
+});
+```
+
+## Features
+✅ **Automatic route registration** - Just place files inside `src/routes/` and they become endpoints.  
+✅ **Named exports for HTTP methods** - Define `GET`, `POST`, `PUT`, `DELETE`, etc., in the same file.  
+✅ **Nested folder support** - Organize routes cleanly with directories.  
+✅ **Base API URL support (`baseApiUrl`)** - Prefix all routes with a versioned API path.  
+✅ **Context-based request handling (`ctx`)** - Simplified request and response management.  
+✅ **Error handling with `asyncHandler`** - Cleaner code with built-in try-catch handling.  
+
+## Conclusion
+DieselJD’s file-based routing makes backend development effortless by removing the need for manual route configuration. Just create a file, export your HTTP methods, and your API is ready to go! With the added support for `baseApiUrl`, you can easily version and structure your API endpoints efficiently.
+
