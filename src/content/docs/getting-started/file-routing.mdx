@@ -12,6 +12,7 @@ DieselJD provides an intuitive **file-based routing** system inspired by Next.js
 
 ## Example Directory Structure
     * Note - Make sure your server file is in your root directory and routes folder under src/
+
 ```bash
 example/
 ├── src/
@@ -88,8 +89,6 @@ export const GET = asyncHandler(async (ctx: ContextType) => {
 ✅ **Named exports for HTTP methods** - Define `GET`, `POST`, `PUT`, `DELETE`, etc., in the same file.  
 ✅ **Nested folder support** - Organize routes cleanly with directories.  
 ✅ **Base API URL support (`baseApiUrl`)** - Prefix all routes with a versioned API path.  
-✅ **Context-based request handling (`ctx`)** - Simplified request and response management.  
-✅ **Error handling with `asyncHandler`** - Cleaner code with built-in try-catch handling.  
 
 ## Conclusion
 DieselJD’s file-based routing makes backend development effortless by removing the need for manual route configuration. Just create a file, export your HTTP methods, and your API is ready to go! With the added support for `baseApiUrl`, you can easily version and structure your API endpoints efficiently.
